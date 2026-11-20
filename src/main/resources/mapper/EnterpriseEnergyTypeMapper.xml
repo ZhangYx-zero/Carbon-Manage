@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.carbon.manage.mapper.EnterpriseEnergyTypeMapper">
+
+    <select id="selectEnergyTypesByEnterpriseId" resultType="string">
+        SELECT energy_type
+        FROM t_enterprise_energy_type
+        WHERE enterprise_id = #{enterpriseId}
+        ORDER BY energy_type
+    </select>
+
+    <select id="selectByEnterpriseIds" resultType="com.carbon.manage.entity.EnterpriseEnergyType">
+        SELECT id, enterprise_id, energy_type, create_time
+        FROM t_enterprise_energy_type
+        WHERE enterprise_id IN
+        <foreach collection="enterpriseIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        ORDER BY enterprise_id, energy_type
+    </select>
+
+    <insert id="insert">
+        INSERT INTO t_enterprise_energy_type (enterprise_id, energy_type)
+        VALUES (#{enterpriseId}, #{energyType})
+    </insert>
+
+    <insert id="insertBatch">
+        INSERT INTO t_enterprise_energy_type (enterprise_id, energy_type)
+        VALUES
+        <foreach collection="energyTypes" item="type" separator=",">
+            (#{enterpriseId}, #{type})
+        </foreach>
+    </insert>
+
+    <delete id="deleteByEnterpriseId">
+        DELETE FROM t_enterprise_energy_type WHERE enterprise_id = #{enterpriseId}
+    </delete>
+
+</mapper>

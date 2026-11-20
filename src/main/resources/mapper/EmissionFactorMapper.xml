@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.carbon.manage.mapper.EmissionFactorMapper">
+
+    <select id="selectList" resultType="com.carbon.manage.entity.EmissionFactor">
+        SELECT id, energy_type, factor_name, factor_value, unit, effective_date,
+               status, remark, create_time, update_time
+        FROM t_emission_factor
+        ORDER BY id
+    </select>
+
+    <select id="selectEnabled" resultType="com.carbon.manage.entity.EmissionFactor">
+        SELECT id, energy_type, factor_name, factor_value, unit, effective_date,
+               status, remark, create_time, update_time
+        FROM t_emission_factor
+        WHERE status = 1
+        ORDER BY id
+    </select>
+
+    <select id="selectById" resultType="com.carbon.manage.entity.EmissionFactor">
+        SELECT id, energy_type, factor_name, factor_value, unit, effective_date,
+               status, remark, create_time, update_time
+        FROM t_emission_factor
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByEnergyType" resultType="com.carbon.manage.entity.EmissionFactor">
+        SELECT id, energy_type, factor_name, factor_value, unit, effective_date,
+               status, remark, create_time, update_time
+        FROM t_emission_factor
+        WHERE energy_type = #{energyType}
+        LIMIT 1
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_emission_factor (energy_type, factor_name, factor_value, unit,
+                                       effective_date, status, remark)
+        VALUES (#{energyType}, #{factorName}, #{factorValue}, #{unit},
+                #{effectiveDate}, #{status}, #{remark})
+    </insert>
+
+    <update id="update">
+        UPDATE t_emission_factor
+        <set>
+            <if test="energyType != null">energy_type = #{energyType},</if>
+            <if test="factorName != null">factor_name = #{factorName},</if>
+            <if test="factorValue != null">factor_value = #{factorValue},</if>
+            <if test="unit != null">unit = #{unit},</if>
+            <if test="effectiveDate != null">effective_date = #{effectiveDate},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM t_emission_factor WHERE id = #{id}
+    </delete>
+
+    <select id="countEnergyData" resultType="int">
+        SELECT COUNT(*) FROM t_energy_data WHERE factor_id = #{factorId}
+    </select>
+
+</mapper>

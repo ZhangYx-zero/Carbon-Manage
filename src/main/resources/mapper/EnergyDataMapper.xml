@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.carbon.manage.mapper.EnergyDataMapper">
+
+    <sql id="pageWhere">
+        <where>
+            <if test="enterpriseId != null">
+                AND d.enterprise_id = #{enterpriseId}
+            </if>
+            <if test="energyType != null and energyType != ''">
+                AND d.energy_type = #{energyType}
+            </if>
+            <if test="exceeded != null">
+                AND d.is_exceeded = #{exceeded}
+            </if>
+        </where>
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_energy_data (enterprise_id, factor_id, energy_type, energy_value,
+                                   emission_value, threshold_value, is_exceeded, collect_time)
+        VALUES (#{enterpriseId}, #{factorId}, #{energyType}, #{energyValue},
+                #{emissionValue}, #{thresholdValue}, #{isExceeded}, #{collectTime})
+    </insert>
+
+    <select id="selectById" resultType="com.carbon.manage.entity.EnergyData">
+        SELECT d.id, d.enterprise_id, d.factor_id, d.energy_type, d.energy_value,
+               d.emission_value, d.threshold_value, d.is_exceeded, d.collect_time, d.create_time,
+               e.enterprise_name, e.workshop_name
+        FROM t_energy_data d
+        JOIN t_enterprise e ON e.id = d.enterprise_id
+        WHERE d.id = #{id}
+    </select>
+
+    <select id="selectDetailById" resultType="com.carbon.manage.entity.EnergyData">
+        SELECT d.id, d.enterprise_id, d.factor_id, d.energy_type, d.energy_value,
+               d.emission_value, d.threshold_value, d.is_exceeded, d.collect_time, d.create_time,
+               e.enterprise_name, e.workshop_name
+        FROM t_energy_data d
+        JOIN t_enterprise e ON e.id = d.enterprise_id
+        WHERE d.id = #{id}
+    </select>
+
+    <select id="selectPage" resultType="com.carbon.manage.entity.EnergyData">
+        SELECT d.id, d.enterprise_id, d.factor_id, d.energy_type, d.energy_value,
+               d.emission_value, d.threshold_value, d.is_exceeded, d.collect_time, d.create_time,
+               e.enterprise_name, e.workshop_name
+        FROM t_energy_data d
+        JOIN t_enterprise e ON e.id = d.enterprise_id
+        <include refid="pageWhere"/>
+        ORDER BY d.collect_time DESC, d.id DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countPage" resultType="long">
+        SELECT COUNT(*)
+        FROM t_energy_data d
+        <include refid="pageWhere"/>
+    </select>
+
+</mapper>

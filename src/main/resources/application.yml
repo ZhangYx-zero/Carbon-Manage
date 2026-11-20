@@ -1,0 +1,60 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: carbon-manage
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/carbon_manage?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: "123456"
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:db/schema.sql
+      encoding: UTF-8
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+  http:
+    client:
+      connect-timeout: 5s
+      read-timeout: 90s
+  ai:
+    model:
+      chat: ollama
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        options:
+          model: qwen2.5:1.5b
+          temperature: 0.3
+
+mybatis:
+  mapper-locations: classpath*:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    default-fetch-size: 100
+    default-statement-timeout: 30
+
+# 业务配置
+carbon:
+  collect:
+    enabled: true
+    interval-ms: 30000
+  ai:
+    enabled: true
+
+app:
+  jwt:
+    secret: carbon-manage-graduation-project-jwt-secret-key-2026
+    expire-hours: 12
+
+logging:
+  level:
+    com.carbon.manage: info
+    org.springframework.ai: info

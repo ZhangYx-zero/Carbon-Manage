@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.carbon.manage.mapper.RectificationOrderMapper">
+
+    <sql id="baseColumns">
+        o.id, o.order_no, o.enterprise_id, o.energy_data_id, o.title, o.suggestion, o.status,
+        o.assignee, o.assignee_id, o.rectify_result, o.audit_remark, o.deadline, o.create_time, o.update_time,
+        e.enterprise_name, e.workshop_name
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_rectification_order (order_no, enterprise_id, energy_data_id, title, suggestion,
+                                           status, assignee, assignee_id, rectify_result, audit_remark, deadline)
+        VALUES (#{orderNo}, #{enterpriseId}, #{energyDataId}, #{title}, #{suggestion},
+                #{status}, #{assignee}, #{assigneeId}, #{rectifyResult}, #{auditRemark}, #{deadline})
+    </insert>
+
+    <select id="selectById" resultType="com.carbon.manage.entity.RectificationOrder">
+        SELECT <include refid="baseColumns"/>
+        FROM t_rectification_order o
+        JOIN t_enterprise e ON e.id = o.enterprise_id
+        WHERE o.id = #{id}
+    </select>
+
+    <select id="selectByEnergyDataId" resultType="com.carbon.manage.entity.RectificationOrder">
+        SELECT <include refid="baseColumns"/>
+        FROM t_rectification_order o
+        JOIN t_enterprise e ON e.id = o.enterprise_id
+        WHERE o.energy_data_id = #{energyDataId}
+        LIMIT 1
+    </select>
+
+    <sql id="pageWhere">
+        <where>
+            <if test="status != null and status != ''">
+                AND o.status = #{status}
+            </if>
+            <if test="enterpriseId != null">
+                AND o.enterprise_id = #{enterpriseId}
+            </if>
+            <if test="assigneeId != null">
+                AND o.assignee_id = #{assigneeId}
+            </if>
+        </where>
+    </sql>
+
+    <select id="selectPage" resultType="com.carbon.manage.entity.RectificationOrder">
+        SELECT <include refid="baseColumns"/>
+        FROM t_rectification_order o
+        JOIN t_enterprise e ON e.id = o.enterprise_id
+        <include refid="pageWhere"/>
+        ORDER BY o.id DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countPage" resultType="long">
+        SELECT COUNT(*)
+        FROM t_rectification_order o
+        <include refid="pageWhere"/>
+    </select>
+
+    <update id="changeStatusCas">
+        UPDATE t_rectification_order
+        SET status = #{to}, update_time = NOW()
+        <if test="assigneeId != null">, assignee_id = #{assigneeId}</if>
+        <if test="assignee != null">, assignee = #{assignee}</if>
+        <if test="rectifyResult != null">, rectify_result = #{rectifyResult}</if>
+        <if test="auditRemark != null">, audit_remark = #{auditRemark}</if>
+        <if test="deadline != null">, deadline = #{deadline}</if>
+        WHERE id = #{id} AND status = #{from}
+    </update>
+
+</mapper>
